@@ -1,23 +1,17 @@
 const serverless = require("serverless-http");
 const express = require("express");
-
-const { neon, neonConfig } = require("@neondatabase/serverless");
+const { getDbClient } = require("./db/clients");
 
 const app = express();
 
-async function dbCLient() {
-  //fr http connection and non-pooling
-  neonConfig.fetchConnectionCache = true;
-  const sql = neon(process.env.DATABASE_URL);
-  return sql;
-}
-
 app.get("/", async (req, res, next) => {
-  const sql = await dbCLient();
+  const sql = await getDbClient();
   const [results] = await sql`select now()`;
+  const delta = (results.now.getTime() - Date.now()) / 1000;
   return res.status(200).json({
     message: "Hello from root!",
     results: results.now,
+    delta: delta,
   });
 });
 
