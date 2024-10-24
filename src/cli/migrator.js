@@ -9,7 +9,10 @@ const ws = require("ws");
 
 async function performMigration() {
   const dbUrl = await secrets.getDatabaseUrl();
-  console.log(dbUrl);
+  if (!dbUrl) {
+    return;
+  }
+  // console.log(dbUrl);
   // neon serverless pool
 
   neonConfig.webSocketConstructor = ws; // <-- this is the key bit
@@ -24,6 +27,7 @@ async function performMigration() {
     await client.query("BEGIN");
 
     const db = await drizzle(client, { schema });
+    await migrate(db, { migrationsFolder: "src/migrations" });
 
     await client.query("COMMIT");
   } catch (err) {
@@ -32,17 +36,18 @@ async function performMigration() {
   } finally {
     client.release();
   }
+  await pool.end();
 }
 
 if (require.main === module) {
-  console.log("run this");
-  console.log(process.env.AWS_ACCESS_KEY_ID);
+  console.log("run Migrations!");
   performMigration()
     .then((val) => {
+      console.log("Migrations Done");
       process.exit(0);
     })
     .catch((err) => {
-      console.log({ error: err });
+      console.log({ migrations_error: err });
       process.exit(1);
     });
 }

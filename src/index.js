@@ -1,8 +1,11 @@
 const serverless = require("serverless-http");
 const express = require("express");
 const { getDbClient } = require("./db/clients");
+const crud = require("./db/crud");
+const validators = require("./db/validators");
 
 const app = express();
+app.use(express.json());
 
 app.get("/", async (req, res, next) => {
   const sql = await getDbClient();
@@ -18,6 +21,43 @@ app.get("/", async (req, res, next) => {
 app.get("/hello", (req, res, next) => {
   return res.status(200).json({
     message: "Hello from path!",
+  });
+});
+
+app.get("/leads", async (req, res, next) => {
+  const results = await crud.listLeads();
+  return res.status(200).json({
+    results: results,
+  });
+});
+app.get("/leads/:id", async (req, res, next) => {
+  const id = req.params.id;
+  const result = await crud.getLeads(id);
+  return res.status(200).json({
+    result: result,
+    // 2:37:34
+  });
+});
+app.post("/leads", async (req, res, next) => {
+  const emailData = await req.body;
+  // const { email } = emailData;
+  const { data, hasError, message } = validators.validateLead(emailData);
+
+  if (hasError === true) {
+    return res.status(400).json({
+      message: message ? message : "Invalid. Please try again",
+    });
+  } else if (hasError === undefined) {
+    return res.status(500).json({
+      message: "server_error",
+    });
+  }
+
+  const result = await crud.newLead(emailData);
+  // insert data to the DB
+  return res.status(201).json({
+    body: emailData,
+    results: result,
   });
 });
 
