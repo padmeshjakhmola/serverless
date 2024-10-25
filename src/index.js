@@ -7,14 +7,16 @@ const validators = require("./db/validators");
 const app = express();
 app.use(express.json());
 
+const STAGE = process.env.STAGE || "prod";
+
 app.get("/", async (req, res, next) => {
   const sql = await getDbClient();
   const [results] = await sql`select now()`;
   const delta = (results.now.getTime() - Date.now()) / 1000;
   return res.status(200).json({
-    message: "Hello from root!",
     results: results.now,
     delta: delta,
+    stage: STAGE,
   });
 });
 
