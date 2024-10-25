@@ -35,13 +35,12 @@ app.get("/leads/:id", async (req, res, next) => {
   const result = await crud.getLeads(id);
   return res.status(200).json({
     result: result,
-    // 2:37:34
   });
 });
 app.post("/leads", async (req, res, next) => {
   const emailData = await req.body;
   // const { email } = emailData;
-  const { data, hasError, message } = validators.validateLead(emailData);
+  const { data, hasError, message } = await validators.validateLead(emailData);
 
   if (hasError === true) {
     return res.status(400).json({
