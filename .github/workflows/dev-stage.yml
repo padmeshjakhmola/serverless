@@ -41,9 +41,8 @@ jobs:
         run: |
           npm run deploy-dev-stage
       - name: Capture Dev Stage Info
-        id: capture_info
         run: |
-          echo "DEV_STAGE_INFO=$(npm run info-dev-stage)" >> $GITHUB_ENV
+          DEV_STAGE_INFO=$(npm run info-dev-stage)
       - name: Dev Stage Pull Request
         run: |
           export PR_BRANCH=$(git branch --show-current)
