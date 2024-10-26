@@ -40,14 +40,19 @@ jobs:
       - name: Deploy dev stage
         run: |
           npm run deploy-dev-stage
+
       - name: Capture Dev Stage Info
         id: capture_info
         run: |
           npm run info-dev-stage > temp.txt
-          DEV_STAGE_INFO=$(cat temp.txt)  
+          DEV_STAGE_INFO=$(cat temp.txt)
+          DEV_STAGE_INFO="${DEV_STAGE_INFO//'%'/'%25'}"  
+          DEV_STAGE_INFO="${DEV_STAGE_INFO//$'\n'/'%0A'}"
+          DEV_STAGE_INFO="${DEV_STAGE_INFO//$'\r'/'%0D'}" 
           echo "DEV_STAGE_INFO<<EOF" >> $GITHUB_ENV
-          echo "$DEV_STAGE_INFO" >> $GITHUB_ENV
+          echo "$DEV_STAGE_INFO" >> $GITHUB_ENV  
           echo "EOF" >> $GITHUB_ENV
+
       - name: Dev Stage Pull Request
         run: |
           export PR_BRANCH=$(git branch --show-current)
