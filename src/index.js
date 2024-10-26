@@ -32,6 +32,7 @@ app.get("/leads", async (req, res, next) => {
     results: results,
   });
 });
+
 app.get("/leads/:id", async (req, res, next) => {
   const id = req.params.id;
   const result = await crud.getLeads(id);
@@ -39,6 +40,7 @@ app.get("/leads/:id", async (req, res, next) => {
     result: result,
   });
 });
+
 app.post("/leads", async (req, res, next) => {
   const emailData = await req.body;
   // const { email } = emailData;

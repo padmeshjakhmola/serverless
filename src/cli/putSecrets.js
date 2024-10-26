@@ -17,7 +17,7 @@ if (require.main === module) {
   secrets
     .putDatabaseUrl(stage, dbUrl)
     .then((val) => {
-      console.log("kkkkkkkkkkk", val);
+      console.log("VALUEESS:", val);
       console.log(`Secret set`);
       process.exit(0);
     })
