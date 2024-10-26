@@ -40,15 +40,13 @@ jobs:
       - name: Deploy dev stage
         run: |
           npm run deploy-dev-stage
-      - name: Capture and Encode Dev Stage Info
+      - name: Capture Dev Stage Info
+        id: capture_info
         run: |
-          DEV_STAGE_INFO=$(npm run info-dev-stage | base64)
-          echo "DEV_STAGE_INFO=$DEV_STAGE_INFO" >> $GITHUB_ENV
+          echo "DEV_STAGE_INFO=$(npm run info-dev-stage)" >> $GITHUB_ENV
       - name: Dev Stage Pull Request
         run: |
           export PR_BRANCH=$(git branch --show-current)
           export DEFAULT_BRANCH=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
           echo "$PR_BRANCH and $DEFAULT_BRANCH"
-          DECODED_INFO=$(echo "$DEV_STAGE_INFO" | base64 --decode)
-          echo "Using Dev Stage Info: $DECODED_INFO"
-          gh pr create --title "Automated PR from Dev Stage" --body "$DECODED_INFO" --base $DEFAULT_BRANCH --head $PR_BRANCH --repo $GITHUB_REPOSITORY
+          gh pr create --title "Automated PR from Dev Stage" --body "$DEV_STAGE_INFO" --base $DEFAULT_BRANCH --head $PR_BRANCH --repo $GITHUB_REPOSITORY
